@@ -119,7 +119,7 @@
 		<br>
 		<br>
 		<br>
-		<footer><p>Updated <?php echo date('l, F jS Y g:i:s A T', $timestamp); ?>. <a href="https://github.com/shehee/SimpleWeblog">Simple Weblog</a> is licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">GNU GPLv3</a>. <a href="https://parsedown.org/">Parsedown</a> is licensed under the <a href="https://github.com/erusev/parsedown/blob/master/LICENSE.txt">The MIT License</a>. Page generated in 
+		<footer><p>Updated <?php echo date('l, F jS Y g:i:s A T', $timestamp); ?>. <a href="https://github.com/shehee/Simple_Weblog">Simple Weblog</a> is licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">GNU GPLv3</a>. <a href="https://parsedown.org/">Parsedown</a> is licensed under the <a href="https://github.com/erusev/parsedown/blob/master/LICENSE.txt">The MIT License</a>. Page generated in 
 		<?php
 			/*
 			// End benchmark
