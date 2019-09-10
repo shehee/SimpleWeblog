@@ -1,0 +1,10 @@
+<?php
+	/*
+	// Define variables: title of blog, timezone, and logfile if desired
+	*/
+	$title = "Ryan's Weblog";
+	$timezone = 'America/Los_Angeles';
+	$welcomeFilename = 'welcome.md';
+	$faqFilename = 'faq.md';
+	$logFilename = '';
+	$adminIP = '';
