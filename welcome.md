@@ -1,0 +1,1 @@
+Hello and welcome! This is a simple weblog, or "slog."
