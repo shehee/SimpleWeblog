@@ -2,7 +2,7 @@
 	/*
 	// Author: Ryan Shehee
 	// Date: 2019-09-05 14:19:00
-	// Version: 0.4
+	// Version: 0.6
 	//
 	// Description: This is a simple weblog that is 
 	// clean, simple, easy, and portable!
@@ -49,28 +49,28 @@
 	/*
 	// Function for making the filename timestamp
 	*/
-	function makeTimestamp($filename) {
-		if(file_exists($filename)) {
+	function makeTimestamp(&$markdownArray) {
+			$filename = $markdownArray['filename'];
 			$filenameArray = explode(".", $filename);
 			$filenameArray = explode("/", $filenameArray[0]);
 			$filenameArray = explode("_", $filenameArray[1]);
 			$filenameArray[1] = str_replace("-", ":", $filenameArray[1]);
-			$timestamp = implode(" ", $filenameArray);
-			$timestamp = strtotime($timestamp);
-			if($timestamp) {
-				return $timestamp;
+			if($filenameArray[1]) {
+				$timestamp = implode(" ", $filenameArray);
+				$timestamp = strtotime($timestamp);
 			} else {
-				return filemtime($filename);
+				$timestamp = $markdownArray['filemtime'];
 			}
-		}
+			return $timestamp;
 	}
 
 	/*
 	// Function for formatting sections
 	*/
-	function markdownToHTML($markdownArray) {
+	function markdownToHTML(&$markdownArray) {
 		if(file_exists($markdownArray['filename'])) {
-			$timestamp = makeTimestamp($markdownArray['filename']);
+			$timestamp = makeTimestamp($markdownArray);
+
 			$year = date('Y', $timestamp);
 			$month = date('F', $timestamp);
 			$date = date('jS', $timestamp);
@@ -120,20 +120,25 @@
 	// Start with Welcome message
 	*/
 	if(file_exists($welcomeFilename)) {
-		$markdownArray['filename'] = $welcomeFilename;
-		$markdownArray['tag'] = 'article';
-		$markdownArray['id'] = 'welcome';
+		$markdownArray = array(
+				'filename' => $welcomeFilename,
+				'tag' => 'article',
+				'id' => 'welcome',
+				'filemtime' => filemtime($welcomeFilename)
+			);
 		$htmlString .= markdownToHTML($markdownArray);
-		unset($markdownArray);
 	}
 	/*
 	// Then add FAQ
 	*/
 	if(file_exists($faqFilename)) {
-		$markdownArray['filename'] = $faqFilename;
-		$markdownArray['id'] = 'faq';
+		$markdownArray = array(
+				'filename' => $faqFilename,
+				'tag' => 'section',
+				'id' => 'faq',
+				'filemtime' => filemtime($faqFilename)
+			);
 		$htmlString .= markdownToHTML($markdownArray);
-		unset($markdownArray);
 	}
 	/*
 	// Finally convert any posts
@@ -142,15 +147,21 @@
 	$count = 0;
 	$total = count($dir);
 	if(is_array($dir)) {
-		foreach($dir as $markdownArray['filename']) {
+		foreach($dir as $postFilename) {
+		$markdownArray = array(
+				'filename' => $postFilename,
+				'tag' => 'section',
+				'id' => '',
+				'filemtime' => filemtime($postFilename)
+			);
 			$count++;
 			if($count == $total) {
 				$markdownArray['id'] = 'latest';
 			}
+			$markdownArray['filemtime'] = filemtime($postFilename);
 			$htmlString .= markdownToHTML($markdownArray);
 		}
 	}
-	unset($markdownArray);
 ?>
 <!DOCTYPE html>
 <html>
@@ -160,8 +171,8 @@
         <style>
             * { margin:0; padding:0; font-family:'Roboto',sans-serif; }
             html, body { font-size:12pt; height: 100%; width:100%; }
-			body > header { background-color:#FFF; display:block; outline:1px solid #333; position:fixed; padding:0.5rem 10%; top:0; width:80%; }
-			body > footer { background-color:#FFF; bottom:0; color:#333; display:block; font-size:.8rem; outline:1px solid #333; padding:0.5rem 10%; position:fixed; width:80%; }
+			body > header { background-color:#FFF; display:block; outline:1px solid #333; position:fixed; padding:0.5rem 10%; top:0; width:80%; z-index:1; }
+			body > footer { background-color:#FFF; bottom:0; color:#333; display:block; font-size:.8rem; outline:1px solid #333; padding:0.5rem 10%; position:fixed; width:80%; z-index:1; }
 			header h1 { float:left; }
 			header p, header nav { text-align:right; }
 			nav a { padding-left: 1rem; }
@@ -171,7 +182,7 @@
 			article footer, section footer { font-size:.8rem; padding:0.5rem 0; width:100%; }
 			h1, h2, h3, h4, h5, h6, p { padding:0.5rem 0; }
 			ol, ul { padding:0.5rem 2rem; }
-			img { width:100%; }
+			img { display:block; margin:0 auto; max-width:100%; }
 			.filesize { color:#CCC; float:right; }
         </style>
     </head>
