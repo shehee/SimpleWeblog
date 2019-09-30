@@ -1,8 +1,8 @@
 <?php
 	/*
 	// Author: Ryan Shehee
-	// Date: 2019-09-05 14:19:00
-	// Version: 0.6
+	// Date: 2019-09-29 17:50:00
+	// Version: 0.7
 	//
 	// Description: This is a simple weblog that is 
 	// clean, simple, easy, and portable!
@@ -83,9 +83,9 @@
 			$contents = file_get_contents($markdownArray['filename']);
 			$filesize = filesize($markdownArray['filename']);
 
-			$htmlString .= !is_null($markdownArray['tag']) ? "<".$markdownArray['tag'] : "<section";
-			$htmlString .= !is_null($markdownArray['class']) ? ' class="'.$markdownArray['class'].'" ' : NULL;
-			$htmlString .= ' id="' . (!is_null($markdownArray['id']) ? $markdownArray['id'] : date('c', $timestamp) ).'">';
+			$htmlString .= !empty($markdownArray['tag']) ? "<".$markdownArray['tag'] : "<section";
+			$htmlString .= !empty($markdownArray['class']) ? ' class="'.$markdownArray['class'].'" ' : NULL;
+			$htmlString .= ' id="' . (!empty($markdownArray['id']) ? $markdownArray['id'] : date('c', $timestamp) ).'">';
 
 			$Parsedown = new Parsedown();
 			$htmlString .= $Parsedown->text($contents);
@@ -103,7 +103,7 @@
 			$htmlString .= '</span>';
 			$htmlString .= '<span class="filesize">'.$filesize.' bytes</span>';
 			$htmlString .= '</footer>';
-			$htmlString .= "</". (!is_null($markdownArray['tag']) ? $markdownArray['tag'] : "section") .">";
+			$htmlString .= "</". (!empty($markdownArray['tag']) ? $markdownArray['tag'] : "section") .">";
 
 			return $htmlString;
 		}
@@ -148,17 +148,16 @@
 	$total = count($dir);
 	if(is_array($dir)) {
 		foreach($dir as $postFilename) {
-		$markdownArray = array(
-				'filename' => $postFilename,
-				'tag' => 'section',
-				'id' => '',
-				'filemtime' => filemtime($postFilename)
-			);
+            $markdownArray = array(
+                'filename' => $postFilename,
+                'tag' => 'section',
+                'id' => NULL,
+                'filemtime' => filemtime($postFilename)
+            );
 			$count++;
 			if($count == $total) {
 				$markdownArray['id'] = 'latest';
 			}
-			$markdownArray['filemtime'] = filemtime($postFilename);
 			$htmlString .= markdownToHTML($markdownArray);
 		}
 	}
@@ -166,24 +165,30 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title><?php echo $title." - ".basename(__FILE__);?></title>
+        <title><?php echo $title." - Updated ".date('D, M jS Y g:i:s A T', $markdownArray['filemtime']); ?></title>
 		<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
         <style>
             * { margin:0; padding:0; font-family:'Roboto',sans-serif; }
             html, body { font-size:12pt; height: 100%; width:100%; }
-			body > header { background-color:#FFF; display:block; outline:1px solid #333; position:fixed; padding:0.5rem 10%; top:0; width:80%; z-index:1; }
-			body > footer { background-color:#FFF; bottom:0; color:#333; display:block; font-size:.8rem; outline:1px solid #333; padding:0.5rem 10%; position:fixed; width:80%; z-index:1; }
+            html { background-color:#FFF; }
+            body { background-color:#FFF; color:#000; }
+            body > header, body > footer { background-color:#FFF; display:block; outline:1px solid #000; padding:0.5rem 10%; position:fixed; width:80%; z-index:1; }
+			body > header { top:0; }
+			body > footer { bottom:0; font-size:0.8rem; }
 			header h1 { float:left; }
-			header p, header nav { text-align:right; }
-			nav a { padding-left: 1rem; }
+			body > header p, body >header nav { text-align:right; }
 			article, section { margin:auto; padding:0.5rem 0; width:80%; }
 			article { margin-top:5rem; }
 			section { border-top:1px solid #CCC; }
-			article footer, section footer { font-size:.8rem; padding:0.5rem 0; width:100%; }
+			article footer, section footer { font-size:0.8rem; padding:0.5rem 0; width:100%; }
 			h1, h2, h3, h4, h5, h6, p { padding:0.5rem 0; }
 			ol, ul { padding:0.5rem 2rem; }
 			img { display:block; margin:0 auto; max-width:100%; }
 			.filesize { color:#CCC; float:right; }
+            a:link { color:#00F; border-bottom:1px solid #00F; border-radius:1rem; text-decoration:none; padding:0 0.5rem; } /* unvisited link */
+            a:visited { color:#00B; } /* visited link */
+            a:hover { color:#008; border-top:1px solid #008; border-bottom:none; } /* mouse over link */
+            a:active { color:#F00; border-top:1px solid #F00; border-bottom:none; } /* selected link */
         </style>
     </head>
     <body>
@@ -197,7 +202,7 @@
 		<br>
 		<br>
 		<br>
-		<footer><p>Updated <?php echo date('l, F jS Y g:i:s A T', $timestamp); ?>. Page generated in 
+		<footer><p>Updated <?php echo date('l, F jS Y g:i:s A T', $markdownArray['filemtime']); ?>. Page generated in 
 		<?php
 			/*
 			// End benchmark
